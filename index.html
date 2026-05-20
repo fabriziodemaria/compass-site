@@ -174,9 +174,12 @@
     }
 
     .card-icon {
-      font-size: 26px;
-      margin-bottom: 14px;
       display: block;
+      width: 28px;
+      height: 28px;
+      margin-bottom: 16px;
+      color: var(--accent);
+      opacity: 0.9;
     }
 
     .card h3 {
@@ -293,22 +296,39 @@
 
   <section class="features">
     <div class="card">
-      <span class="card-icon">🔀</span>
+      <!-- git merge / pull request -->
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="9" r="2.5"/>
+        <path d="M6 8.5v7"/><path d="M8.5 6h4a3 3 0 0 1 3 3v.5"/>
+      </svg>
       <h3>Pull Requests</h3>
       <p>Track open PRs, view CI status, read comments, and get AI-powered code reviews — all without leaving the app.</p>
     </div>
     <div class="card">
-      <span class="card-icon">🖥️</span>
+      <!-- monitor / workspace -->
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8M12 17v4"/>
+      </svg>
       <h3>Cursor Workspaces</h3>
       <p>Browse and open your Cursor workspaces tied to local repos with a single click.</p>
     </div>
     <div class="card">
-      <span class="card-icon">🤖</span>
+      <!-- agent / sparkle -->
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v2M12 19v2M3 12h2M19 12h2"/>
+        <path d="M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
+        <path d="M5.6 5.6l1.4 1.4M16.9 16.9l1.5 1.5M5.6 18.4l1.4-1.4M16.9 7.1l1.5-1.5"/>
+      </svg>
       <h3>Claude Agents</h3>
       <p>Explore your Cursor and Claude Code agent session history and transcripts in a searchable timeline.</p>
     </div>
     <div class="card">
-      <span class="card-icon">🗺️</span>
+      <!-- canvas / map grid -->
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
       <h3>Home Map</h3>
       <p>A canvas-style home that clusters your PRs, bookmarks, and agent sessions into one spatial overview.</p>
     </div>
