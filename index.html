@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compass — macOS Dev Hub</title>
+  <meta name="description" content="Compass is a macOS productivity app that centralises your developer workflow: GitHub PRs, Cursor workspaces, and Claude agent sessions in one place." />
+  <meta property="og:title" content="Compass — macOS Dev Hub" />
+  <meta property="og:description" content="One app for your PRs, Cursor workspaces, and Claude agent sessions." />
+  <meta property="og:image" content="icon.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161b27;
+      --border: rgba(255,255,255,0.07);
+      --accent: #4f8ef7;
+      --accent-glow: rgba(79,142,247,0.25);
+      --text: #e8eaf0;
+      --muted: #7a8099;
+      --pill-bg: rgba(79,142,247,0.12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── hero ── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 96px 24px 72px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .icon-wrap {
+      width: 108px;
+      height: 108px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px var(--border), 0 24px 64px rgba(0,0,0,0.6), 0 0 48px var(--accent-glow);
+      margin-bottom: 32px;
+    }
+    .icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--pill-bg);
+      border: 1px solid rgba(79,142,247,0.3);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 40%, #8aa8f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 26px;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 24px var(--accent-glow);
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px var(--accent-glow);
+      background: #6ba0f9;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 500;
+      padding: 13px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    .version-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .version-note a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ── features ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 0 24px 80px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      border-color: rgba(79,142,247,0.3);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    .card-icon {
+      font-size: 26px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .card p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── requirements ── */
+    .requirements {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      max-width: 680px;
+      width: calc(100% - 48px);
+      margin-bottom: 80px;
+    }
+    .requirements h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+    .req-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .req-list li {
+      background: var(--pill-bg);
+      border: 1px solid rgba(79,142,247,0.2);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 99px;
+    }
+
+    /* ── footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      width: 100%;
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ── download svg icon ── */
+    .dl-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f4f6fb;
+        --surface: #fff;
+        --border: rgba(0,0,0,0.08);
+        --text: #111827;
+        --muted: #6b7280;
+        --pill-bg: rgba(79,142,247,0.1);
+      }
+      h1 {
+        background: linear-gradient(135deg, #111827 40%, #4f8ef7);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="icon-wrap">
+      <img src="icon.png" alt="Compass icon" />
+    </div>
+
+    <span class="badge">macOS 15+</span>
+
+    <h1>Your developer<br>workflow, in one place</h1>
+
+    <p class="subtitle">
+      Compass is a macOS app that brings together GitHub pull requests,
+      Cursor workspaces, and Claude agent sessions — so you spend less time
+      context-switching and more time shipping.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn-primary" href="https://github.com/fabriziodemaria/claudesk/releases/download/v1.0.1/Compass-1.0.1.dmg">
+        <svg class="dl-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1v9M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Download for Mac
+      </a>
+      <a class="btn-secondary" href="https://github.com/fabriziodemaria/claudesk" target="_blank" rel="noopener">
+        View on GitHub →
+      </a>
+    </div>
+
+    <p class="version-note">
+      Version 1.0.1 · macOS 15 Sequoia or later ·
+      <a href="https://github.com/fabriziodemaria/claudesk/releases" target="_blank" rel="noopener">All releases</a>
+    </p>
+  </section>
+
+  <section class="features">
+    <div class="card">
+      <span class="card-icon">🔀</span>
+      <h3>Pull Requests</h3>
+      <p>Track open PRs, view CI status, read comments, and get AI-powered code reviews — all without leaving the app.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🖥️</span>
+      <h3>Cursor Workspaces</h3>
+      <p>Browse and open your Cursor workspaces tied to local repos with a single click.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🤖</span>
+      <h3>Claude Agents</h3>
+      <p>Explore your Cursor and Claude Code agent session history and transcripts in a searchable timeline.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🗺️</span>
+      <h3>Home Map</h3>
+      <p>A canvas-style home that clusters your PRs, bookmarks, and agent sessions into one spatial overview.</p>
+    </div>
+  </section>
+
+  <div class="requirements">
+    <h2>Requirements</h2>
+    <ul class="req-list">
+      <li>macOS 15 Sequoia+</li>
+      <li>gh CLI (authenticated)</li>
+      <li>Claude CLI</li>
+      <li>Cursor</li>
+      <li>iTerm2</li>
+    </ul>
+  </div>
+
+  <footer>
+    Built by <a href="https://github.com/fabriziodemaria" target="_blank" rel="noopener">Fabrizio De Maria</a> ·
+    <a href="https://github.com/fabriziodemaria/claudesk" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+
+</body>
+</html>
