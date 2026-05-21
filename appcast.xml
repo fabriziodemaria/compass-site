@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Compass</title>
+    <description>Compass update feed</description>
+    <language>en</language>
+    <item>
+      <title>Compass 1.0.1</title>
+      <pubDate>Tue, 20 May 2026 13:37:12 +0000</pubDate>
+      <sparkle:version>202605201535</sparkle:version>
+      <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <enclosure
+        url="https://github.com/fabriziodemaria/compass-site/releases/download/v1.0.1/Compass-1.0.1.dmg"
+        sparkle:edSignature="JI08DOF+dTeSWpQk0z8MCwj3bMcEYKEMCG7LDgrcElFroY0q8GQ2M++AykH5NzuW0FlPwz7cDPZcTUL7fGzuCA=="
+        length="17097625"
+        type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>
