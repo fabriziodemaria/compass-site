@@ -194,9 +194,62 @@
     }
     .brand-mark svg { width: 100%; height: 100%; }
 
-    /* Claude is the only mark with an official color version — keep its
-       brand orange and skip the rest opacity so it doesn't read as muted. */
-    .brand-mark.claude-mark { opacity: 1; }
+    /* ── feature showcase ── */
+    .showcase {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(56px, 9vw, 96px);
+      padding: 0 24px 96px;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(32px, 5vw, 64px);
+    }
+    .feature-row:nth-child(even) { flex-direction: row-reverse; }
+
+    .feature-shot {
+      flex: 1 1 58%;
+      min-width: 0;
+    }
+    .feature-shot img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 14px;
+      box-shadow:
+        0 0 0 1px var(--border),
+        0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .feature-text {
+      flex: 1 1 42%;
+    }
+    .feature-text h3 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .feature-text p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    @media (max-width: 720px) {
+      .feature-row,
+      .feature-row:nth-child(even) {
+        flex-direction: column;
+        gap: 24px;
+      }
+      .feature-text { text-align: center; }
+    }
 
     /* ── footer ── */
     footer {
@@ -278,12 +331,58 @@
         </svg>
       </span>
 
-      <!-- Claude Code (lobe-icons, official brand color #D97757) -->
-      <span class="brand-mark claude-mark" role="img" aria-label="Claude">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#D97757" fill-rule="evenodd" d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"/>
+      <!-- Claude Code (lobe-icons, rendered template-style to match the row) -->
+      <span class="brand-mark" role="img" aria-label="Claude">
+        <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"/>
         </svg>
       </span>
+    </div>
+  </section>
+
+  <section class="showcase">
+    <div class="feature-row">
+      <div class="feature-shot">
+        <img src="screenshot-prs.png" width="1024" height="731"
+             loading="lazy" alt="Pull Requests view in Compass" />
+      </div>
+      <div class="feature-text">
+        <h3>Pull Requests</h3>
+        <p>Every PR with live CI, comments, and AI reviews — at a glance.</p>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-shot">
+        <img src="screenshot-workspaces.png" width="1024" height="731"
+             loading="lazy" alt="Workspaces view in Compass" />
+      </div>
+      <div class="feature-text">
+        <h3>Workspaces</h3>
+        <p>Open any local repo in Cursor or Claude with one click.</p>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-shot">
+        <img src="screenshot-agents.png" width="1024" height="731"
+             loading="lazy" alt="Agents view in Compass" />
+      </div>
+      <div class="feature-text">
+        <h3>Agents</h3>
+        <p>Search and resume any Cursor or Claude Code chat from one timeline.</p>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-shot">
+        <img src="screenshot-map.png" width="1024" height="731"
+             loading="lazy" alt="Map view in Compass" />
+      </div>
+      <div class="feature-text">
+        <h3>Map</h3>
+        <p>Cluster your active work onto a canvas-style home.</p>
+      </div>
     </div>
   </section>
 
