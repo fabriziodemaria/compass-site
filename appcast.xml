@@ -5,6 +5,18 @@
     <description>Compass update feed</description>
     <language>en</language>
     <item>
+  <title>Compass 1.0.17</title>
+  <pubDate>Wed, 12 Aug 2026 08:55:27 +0000</pubDate>
+  <sparkle:version>202608121053</sparkle:version>
+  <sparkle:shortVersionString>1.0.17</sparkle:shortVersionString>
+  <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+  <enclosure
+    url="https://github.com/fabriziodemaria/compass-site/releases/download/v1.0.17/Compass-1.0.17.dmg"
+    sparkle:edSignature="/HaW1Zm8h+IPztcKXxlCKAizSX4m+rBIX74qatVyqwpRaPQwI9UioDKjg3+9paYQg4V78QzX6wl2Jy/dR0V3Bg=="
+    length="28214775"
+    type="application/octet-stream"/>
+</item>
+    <item>
   <title>Compass 1.0.16</title>
   <pubDate>Tue, 04 Aug 2026 10:07:10 +0000</pubDate>
   <sparkle:version>202608041205</sparkle:version>
