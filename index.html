@@ -3,23 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compass — macOS Dev Hub</title>
-  <meta name="description" content="Compass is a macOS productivity app that centralises your developer workflow: GitHub PRs, Cursor workspaces, and Claude agent sessions in one place." />
-  <meta property="og:title" content="Compass — macOS Dev Hub" />
-  <meta property="og:description" content="One app for your PRs, Cursor workspaces, and Claude agent sessions." />
+  <title>Compass — The Cursor Companion</title>
+  <meta name="description" content="Compass is the macOS companion app for Cursor: track every ongoing project and PR, resume any Cursor workspace in one click, and run isolated, parallelizable workflows with git worktrees." />
+  <meta property="og:title" content="Compass — The Cursor Companion" />
+  <meta property="og:description" content="Track your projects and PRs, resume Cursor workspaces instantly, and keep every workflow isolated and parallelizable." />
   <meta property="og:image" content="icon.png" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0d0f14;
-      --surface: #161b27;
-      --border: rgba(255,255,255,0.07);
-      --accent: #4f8ef7;
-      --accent-glow: rgba(79,142,247,0.25);
-      --text: #e8eaf0;
-      --muted: #7a8099;
-      --pill-bg: rgba(79,142,247,0.12);
+      --bg: #08090d;
+      --bg-2: #0d0f16;
+      --surface: #14161f;
+      --surface-2: #191c27;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --accent: #5b8ef9;
+      --accent-2: #a06bf7;
+      --accent-3: #4fd8c4;
+      --accent-glow: rgba(91,142,249,0.28);
+      --text: #f1f2f7;
+      --muted: #8a90a6;
+      --muted-2: #6b7189;
+      --pill-bg: rgba(91,142,249,0.1);
+      --radius-lg: 20px;
+      --radius-md: 14px;
     }
 
     html { scroll-behavior: smooth; }
@@ -32,363 +40,752 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
+
+    a { color: inherit; }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    /* ── reveal-on-scroll ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s cubic-bezier(.16,.9,.35,1), transform 0.7s cubic-bezier(.16,.9,.35,1);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ── nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      background: rgba(8,9,13,0.6);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+    nav.scrolled { border-bottom-color: var(--border); }
+    .nav-inner {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+    .nav-brand img { width: 26px; height: 26px; border-radius: 7px; }
+    .nav-brand .tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      background: var(--pill-bg);
+      border: 1px solid rgba(91,142,249,0.3);
+      padding: 2px 7px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--text);
+      color: #0a0b10;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 99px;
+      text-decoration: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .nav-cta:hover { transform: translateY(-1px); opacity: 0.9; }
 
     /* ── hero ── */
     .hero {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 96px 24px 72px;
-      max-width: 680px;
+      padding: 108px 24px 88px;
+      max-width: 780px;
       width: 100%;
+      isolation: isolate;
+    }
+
+    .aurora {
+      position: absolute;
+      inset: -140px 0 auto 0;
+      height: 780px;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .aurora::before,
+    .aurora::after,
+    .aurora span {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.55;
+    }
+    .aurora::before {
+      width: 520px; height: 520px;
+      top: 40px; left: 50%;
+      margin-left: -540px;
+      background: radial-gradient(circle at 30% 30%, var(--accent), transparent 70%);
+      animation: drift1 22s ease-in-out infinite alternate;
+    }
+    .aurora::after {
+      width: 560px; height: 560px;
+      top: 10px; left: 50%;
+      margin-left: 120px;
+      background: radial-gradient(circle at 60% 40%, var(--accent-2), transparent 70%);
+      animation: drift2 26s ease-in-out infinite alternate;
+    }
+    .aurora span {
+      width: 380px; height: 380px;
+      top: 260px; left: 50%;
+      margin-left: -190px;
+      background: radial-gradient(circle at 50% 50%, var(--accent-3), transparent 72%);
+      opacity: 0.35;
+      animation: drift3 30s ease-in-out infinite alternate;
+    }
+    .grain-fade {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 0%, transparent 0%, var(--bg) 78%),
+        linear-gradient(180deg, transparent 55%, var(--bg) 100%);
+    }
+
+    @keyframes drift1 {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(60px,40px) scale(1.12); }
+    }
+    @keyframes drift2 {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(-50px,60px) scale(0.92); }
+    }
+    @keyframes drift3 {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(30px,-40px) scale(1.15); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .aurora::before, .aurora::after, .aurora span { animation: none; }
     }
 
     .icon-wrap {
-      width: 108px;
-      height: 108px;
-      border-radius: 50%;
+      width: 96px;
+      height: 96px;
+      border-radius: 26px;
       overflow: hidden;
-      box-shadow: 0 0 0 1px var(--border), 0 24px 64px rgba(0,0,0,0.6), 0 0 48px var(--accent-glow);
-      margin-bottom: 32px;
+      box-shadow: 0 0 0 1px var(--border-strong), 0 24px 64px rgba(0,0,0,0.6), 0 0 56px var(--accent-glow);
+      margin-bottom: 28px;
     }
     .icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
-
-    .product-name {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text);
-      opacity: 0.55;
-      margin-bottom: 16px;
-    }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       background: var(--pill-bg);
-      border: 1px solid rgba(79,142,247,0.3);
-      color: var(--accent);
+      border: 1px solid rgba(91,142,249,0.32);
+      color: #a9c4ff;
       font-size: 12px;
       font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 4px 12px;
+      letter-spacing: 0.04em;
+      padding: 5px 14px 5px 10px;
       border-radius: 99px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
+    }
+    .badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-3);
+      box-shadow: 0 0 8px var(--accent-3);
     }
 
     h1 {
-      font-size: clamp(2.4rem, 6vw, 3.4rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #fff 40%, #8aa8f5);
+      font-size: clamp(2.6rem, 6.6vw, 3.8rem);
+      font-weight: 750;
+      letter-spacing: -0.035em;
+      line-height: 1.08;
+      margin-bottom: 22px;
+      background: linear-gradient(135deg, #fff 30%, #b9c8ff 65%, #9adfd2 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .subtitle {
-      font-size: 1.15rem;
+      font-size: 1.18rem;
       color: var(--muted);
-      line-height: 1.7;
-      max-width: 520px;
-      margin-bottom: 40px;
+      line-height: 1.65;
+      max-width: 540px;
+      margin-bottom: 36px;
     }
+    .subtitle strong { color: var(--text); font-weight: 600; }
 
     .cta-row {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
+      margin-bottom: 16px;
     }
 
     .btn-primary {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: var(--accent);
+      gap: 9px;
+      background: linear-gradient(135deg, var(--accent), #7d7bf6);
       color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 13px 26px;
-      border-radius: 12px;
+      font-size: 15.5px;
+      font-weight: 650;
+      padding: 14px 28px;
+      border-radius: 13px;
       text-decoration: none;
-      box-shadow: 0 4px 24px var(--accent-glow);
-      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+      box-shadow: 0 4px 28px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.2);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px var(--accent-glow);
-      background: #6ba0f9;
+      box-shadow: 0 10px 36px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.25);
     }
 
     .btn-secondary {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: transparent;
+      background: rgba(255,255,255,0.03);
       color: var(--muted);
       font-size: 15px;
       font-weight: 500;
-      padding: 13px 22px;
-      border-radius: 12px;
+      padding: 14px 24px;
+      border-radius: 13px;
       border: 1px solid var(--border);
       text-decoration: none;
-      transition: color 0.15s, border-color 0.15s;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
     }
-    .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .btn-secondary:hover { color: var(--text); border-color: var(--border-strong); background: rgba(255,255,255,0.05); }
 
     .version-note {
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 12.5px;
+      color: var(--muted-2);
     }
-    .version-note a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ── highlight pills ── */
+    .highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 0 24px 96px;
+      max-width: 820px;
+      width: 100%;
+    }
+    .highlight-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 9px 16px;
+      border-radius: 99px;
+    }
+    .highlight-pill svg { width: 15px; height: 15px; color: var(--accent-3); flex-shrink: 0; }
 
     /* ── integrations ── */
     .integrations {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 24px 80px;
+      padding: 0 24px 100px;
       max-width: 900px;
       width: 100%;
     }
 
-    .integrations-title {
-      font-size: clamp(1.35rem, 2.6vw, 1.7rem);
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-bottom: 36px;
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
       text-align: center;
+    }
+
+    .integrations-title {
+      font-size: clamp(1.5rem, 3vw, 1.9rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text);
+      margin-bottom: 40px;
+      text-align: center;
+      max-width: 480px;
     }
 
     .integrations-row {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      gap: clamp(40px, 8vw, 80px);
+      gap: 18px;
       flex-wrap: wrap;
+      width: 100%;
     }
 
+    .brand-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 168px;
+      padding: 28px 16px;
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: transform 0.22s cubic-bezier(.16,.9,.35,1), border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .brand-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-strong);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    }
+    .brand-card--primary {
+      border-color: rgba(91,142,249,0.4);
+      background: linear-gradient(180deg, rgba(91,142,249,0.14), var(--surface-2));
+      box-shadow: 0 0 0 1px rgba(91,142,249,0.12), 0 16px 40px var(--accent-glow);
+    }
+    .brand-card--primary .brand-label { color: var(--text); }
     .brand-mark {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 52px;
-      height: 52px;
+      width: 34px;
+      height: 34px;
       color: var(--text);
-      opacity: 0.82;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .brand-mark:hover {
-      opacity: 1;
-      transform: translateY(-2px);
     }
     .brand-mark svg { width: 100%; height: 100%; }
+    .brand-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+
+    .disclaimer {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--muted-2);
+      text-align: center;
+      max-width: 480px;
+    }
 
     /* ── feature showcase ── */
     .showcase {
       display: flex;
       flex-direction: column;
-      gap: clamp(56px, 9vw, 96px);
-      padding: 0 24px 96px;
-      max-width: 1100px;
+      gap: clamp(64px, 10vw, 108px);
+      padding: 0 24px 110px;
+      max-width: 1120px;
       width: 100%;
     }
 
     .feature-row {
       display: flex;
       align-items: center;
-      gap: clamp(32px, 5vw, 64px);
+      gap: clamp(36px, 5vw, 68px);
     }
     .feature-row:nth-child(even) { flex-direction: row-reverse; }
 
     .feature-shot {
       flex: 1 1 58%;
       min-width: 0;
+      position: relative;
+      border-radius: var(--radius-lg);
+      padding: 1px;
+      background: linear-gradient(160deg, var(--border-strong), transparent 40%, var(--border) 100%);
+    }
+    .feature-shot::after {
+      content: "";
+      position: absolute;
+      inset: -30px;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 40%, var(--accent-glow), transparent 68%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .feature-shot-inner {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg);
     }
     .feature-shot img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 14px;
-      box-shadow:
-        0 0 0 1px var(--border),
-        0 24px 64px rgba(0,0,0,0.5);
+    }
+    .feature-shot-inner::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 30%;
+      background: linear-gradient(180deg, transparent, var(--bg) 92%);
+      pointer-events: none;
     }
 
-    .feature-text {
-      flex: 1 1 42%;
+    .feature-text { flex: 1 1 42%; }
+    .feature-index {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+      text-transform: uppercase;
     }
     .feature-text h3 {
-      font-size: clamp(1.5rem, 3vw, 2rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      margin-bottom: 12px;
+      font-size: clamp(1.6rem, 3.2vw, 2.15rem);
+      font-weight: 750;
+      letter-spacing: -0.025em;
+      line-height: 1.18;
+      margin-bottom: 14px;
       color: var(--text);
     }
     .feature-text p {
-      font-size: 1.05rem;
-      line-height: 1.6;
+      font-size: 1.06rem;
+      line-height: 1.65;
       color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .feature-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      padding: 5px 11px;
+      border-radius: 99px;
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 760px) {
       .feature-row,
       .feature-row:nth-child(even) {
         flex-direction: column;
-        gap: 24px;
+        gap: 26px;
       }
       .feature-text { text-align: center; }
+      .feature-tags { justify-content: center; }
+    }
+
+    /* ── final CTA ── */
+    .final-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 24px 110px;
+      padding: 64px 40px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(91,142,249,0.18), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(160,107,247,0.14), transparent 55%),
+        var(--surface);
+      border: 1px solid var(--border);
+    }
+    .final-cta h2 {
+      font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+      font-weight: 750;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+    .final-cta p {
+      color: var(--muted);
+      font-size: 1.02rem;
+      max-width: 420px;
     }
 
     /* ── footer ── */
     footer {
       border-top: 1px solid var(--border);
       width: 100%;
-      text-align: center;
-      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 30px 24px;
       font-size: 13px;
-      color: var(--muted);
+      color: var(--muted-2);
     }
-    footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+    .footer-row { display: flex; align-items: center; gap: 6px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .footer-sep { opacity: 0.4; }
+    .footer-disclaimer {
+      font-size: 11.5px;
+      color: var(--muted-2);
+      opacity: 0.75;
+      text-align: center;
+      max-width: 560px;
+    }
 
-    /* ── download svg icon ── */
-    .dl-icon { width: 16px; height: 16px; flex-shrink: 0; }
+    /* ── icons ── */
+    .dl-icon, .gh-icon { width: 16px; height: 16px; flex-shrink: 0; }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg: #f4f6fb;
-        --surface: #fff;
-        --border: rgba(0,0,0,0.08);
-        --text: #111827;
-        --muted: #6b7280;
-        --pill-bg: rgba(79,142,247,0.1);
+        --bg: #f6f7fb;
+        --bg-2: #eef0f7;
+        --surface: #ffffff;
+        --surface-2: #f6f7fc;
+        --border: rgba(15,23,42,0.08);
+        --border-strong: rgba(15,23,42,0.14);
+        --text: #10131c;
+        --muted: #5b6072;
+        --muted-2: #7a7f92;
+        --pill-bg: rgba(91,142,249,0.1);
       }
+      nav { background: rgba(246,247,251,0.7); }
       h1 {
-        background: linear-gradient(135deg, #111827 40%, #4f8ef7);
+        background: linear-gradient(135deg, #10131c 30%, #3f6fe0 65%, #1f9a86 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
       }
+      .nav-cta { background: #10131c; color: #fff; }
+      .badge { color: #2d5fd9; }
+      .aurora::before, .aurora::after, .aurora span { opacity: 0.28; }
+      .feature-shot-inner::after { background: linear-gradient(180deg, transparent, var(--bg) 92%); }
     }
   </style>
 </head>
 <body>
 
-  <section class="hero">
+  <nav id="siteNav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#top">
+        <img src="icon.png" alt="" />
+        Compass
+        <span class="tag">for Cursor</span>
+      </a>
+      <a class="nav-cta" href="#download">
+        <svg class="dl-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1v9M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Download
+      </a>
+    </div>
+  </nav>
+
+  <section class="hero" id="top">
+    <div class="aurora"><span></span></div>
+    <div class="grain-fade"></div>
+
     <div class="icon-wrap">
       <img src="icon.png" alt="Compass icon" />
     </div>
 
-    <h2 class="product-name">Compass</h2>
+    <span class="badge"><span class="dot"></span>The companion app for Cursor</span>
 
-    <h1>Your AI developer<br>workflow, in one place</h1>
+    <h1>Your Cursor companion,<br>built for parallel work</h1>
 
     <p class="subtitle">
-      Compass is a macOS app that brings together GitHub pull requests,
-      Cursor workspaces, and Claude agent sessions — so you spend less time
-      context-switching and more time shipping.
+      Compass keeps every <strong>project</strong> and <strong>PR</strong> in view,
+      lets you resume any <strong>Cursor workspace</strong> in one click, and spins up
+      <strong>isolated, parallelizable workflows</strong> with git worktrees —
+      so nothing you're running blocks anything else.
     </p>
 
-    <div class="cta-row">
+    <div class="cta-row" id="download">
       <a class="btn-primary" href="https://github.com/fabriziodemaria/compass-site/releases/download/v1.0.18/Compass-1.0.18.dmg">
         <svg class="dl-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 1v9M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Download for Mac
       </a>
+      <a class="btn-secondary" href="#showcase">
+        See it in action
+      </a>
     </div>
 
     <p class="version-note">
-      Version 1.0.18 · macOS 15 Sequoia or later
+      Version 1.0.18 · macOS 15 Sequoia or later · Free
     </p>
   </section>
 
-  <section class="integrations">
-    <h2 class="integrations-title">Track your ongoing work effortlessly</h2>
+  <div class="highlights reveal">
+    <span class="highlight-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+      Resume any Cursor workspace in one click
+    </span>
+    <span class="highlight-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="4" r="2.5"/><circle cx="6" cy="16" r="2.5"/><circle cx="18" cy="8" r="2.5"/><path d="M6 6.5V13.5M18 10.5A7 7 0 0 1 11 17.5"/></svg>
+      Isolated, parallel workflows via git worktrees
+    </span>
+    <span class="highlight-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Every project and PR tracked automatically
+    </span>
+  </div>
+
+  <section class="integrations reveal">
+    <p class="section-eyebrow">Built around Cursor</p>
+    <h2 class="integrations-title">Cursor at the center — GitHub one click away</h2>
     <div class="integrations-row">
-      <!-- GitHub Octocat (Simple Icons, public domain) -->
-      <span class="brand-mark" role="img" aria-label="GitHub">
-        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-        </svg>
-      </span>
+      <div class="brand-card brand-card--primary">
+        <span class="brand-mark" role="img" aria-label="Cursor">
+          <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.106 5.68L12.5.135a.998.998 0 00-.998 0L1.893 5.68a.84.84 0 00-.419.726v11.186c0 .3.16.577.42.727l9.607 5.547a.999.999 0 00.998 0l9.608-5.547a.84.84 0 00.42-.727V6.407a.84.84 0 00-.42-.726zm-.603 1.176L12.228 22.92c-.063.108-.228.064-.228-.061V12.34a.59.59 0 00-.295-.51l-9.11-5.26c-.107-.062-.063-.228.062-.228h18.55c.264 0 .428.286.296.514z"/>
+          </svg>
+        </span>
+        <span class="brand-label">Cursor</span>
+      </div>
 
-      <!-- Cursor (lobe-icons, monochrome) -->
-      <span class="brand-mark" role="img" aria-label="Cursor">
-        <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.106 5.68L12.5.135a.998.998 0 00-.998 0L1.893 5.68a.84.84 0 00-.419.726v11.186c0 .3.16.577.42.727l9.607 5.547a.999.999 0 00.998 0l9.608-5.547a.84.84 0 00.42-.727V6.407a.84.84 0 00-.42-.726zm-.603 1.176L12.228 22.92c-.063.108-.228.064-.228-.061V12.34a.59.59 0 00-.295-.51l-9.11-5.26c-.107-.062-.063-.228.062-.228h18.55c.264 0 .428.286.296.514z"/>
-        </svg>
-      </span>
+      <div class="brand-card">
+        <span class="brand-mark" role="img" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+          </svg>
+        </span>
+        <span class="brand-label">GitHub</span>
+      </div>
 
-      <!-- Claude Code (lobe-icons, rendered template-style to match the row) -->
-      <span class="brand-mark" role="img" aria-label="Claude">
-        <svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"/>
-        </svg>
-      </span>
+    </div>
+    <p class="disclaimer">Independent hobby project — not affiliated with, endorsed by, or built in collaboration with Cursor or GitHub.</p>
+  </section>
+
+  <section class="showcase" id="showcase">
+    <div class="feature-row reveal">
+      <div class="feature-shot">
+        <div class="feature-shot-inner">
+          <img src="screenshot-workspaces.png" width="1024" height="580"
+               loading="lazy" alt="Workspaces view in Compass" />
+        </div>
+      </div>
+      <div class="feature-text">
+        <p class="feature-index">01 · Workspaces</p>
+        <h3>Resume any Cursor workspace, instantly</h3>
+        <p>Compass scans your machine for git repos and surfaces branch, PR, and comment activity — jump straight back into Cursor with the right folder already open. Spin up an <strong>isolated workspace</strong> and Compass creates a dedicated git worktree per repo, so you can run several Cursor sessions on different branches in parallel without any of them stepping on each other.</p>
+        <div class="feature-tags">
+          <span class="feature-tag">Instant resume</span>
+          <span class="feature-tag">Isolated worktrees</span>
+          <span class="feature-tag">Run in parallel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reveal">
+      <div class="feature-shot">
+        <div class="feature-shot-inner">
+          <img src="screenshot-prs.png" width="1024" height="580"
+               loading="lazy" alt="Pull Requests view in Compass" />
+        </div>
+      </div>
+      <div class="feature-text">
+        <p class="feature-index">02 · Pull Requests</p>
+        <h3>Every PR, tracked without leaving Cursor</h3>
+        <p>Live CI status, review threads, and AI summaries roll up automatically — grouped by epic so you always know what's blocked and what's ready to ship.</p>
+        <div class="feature-tags">
+          <span class="feature-tag">Live CI</span>
+          <span class="feature-tag">Smart grouping</span>
+          <span class="feature-tag">AI reviews</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reveal">
+      <div class="feature-shot">
+        <div class="feature-shot-inner">
+          <img src="screenshot-map.png" width="1024" height="580"
+               loading="lazy" alt="Projects view in Compass" />
+        </div>
+      </div>
+      <div class="feature-text">
+        <p class="feature-index">03 · Projects</p>
+        <h3>All your ongoing work, one canvas</h3>
+        <p>Drag related PRs and repos into freeform groups, keep an eye on open counts and CI failures at a glance, and pick back up exactly where you left off — across every parallel Cursor workspace you've got running.</p>
+        <div class="feature-tags">
+          <span class="feature-tag">Canvas board</span>
+          <span class="feature-tag">Custom clusters</span>
+          <span class="feature-tag">At-a-glance status</span>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="showcase">
-    <div class="feature-row">
-      <div class="feature-shot">
-        <img src="screenshot-prs.png" width="1024" height="731"
-             loading="lazy" alt="Pull Requests view in Compass" />
-      </div>
-      <div class="feature-text">
-        <h3>Pull Requests</h3>
-        <p>Every PR with live CI, comments, and AI reviews — at a glance.</p>
-      </div>
-    </div>
-
-    <div class="feature-row">
-      <div class="feature-shot">
-        <img src="screenshot-workspaces.png" width="1024" height="731"
-             loading="lazy" alt="Workspaces view in Compass" />
-      </div>
-      <div class="feature-text">
-        <h3>Workspaces</h3>
-        <p>Open any local repo in Cursor or Claude with one click.</p>
-      </div>
-    </div>
-
-    <div class="feature-row">
-      <div class="feature-shot">
-        <img src="screenshot-agents.png" width="1024" height="731"
-             loading="lazy" alt="Agents view in Compass" />
-      </div>
-      <div class="feature-text">
-        <h3>Agents</h3>
-        <p>Search and resume any Cursor or Claude Code chat from one timeline.</p>
-      </div>
-    </div>
-
-    <div class="feature-row">
-      <div class="feature-shot">
-        <img src="screenshot-map.png" width="1024" height="731"
-             loading="lazy" alt="Map view in Compass" />
-      </div>
-      <div class="feature-text">
-        <h3>Map</h3>
-        <p>Cluster your active work onto a canvas-style home.</p>
-      </div>
-    </div>
+  <section class="final-cta reveal">
+    <h2>Give your Cursor workflow a home.</h2>
+    <p>Compass is free, native, and ready alongside Cursor in under a minute.</p>
+    <a class="btn-primary" href="https://github.com/fabriziodemaria/compass-site/releases/download/v1.0.18/Compass-1.0.18.dmg">
+      <svg class="dl-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1v9M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Download for Mac
+    </a>
   </section>
 
   <footer>
-    Built by Fabrizio Demaria
+    <div class="footer-row">
+      <span>Built by Fabrizio Demaria as a hobby project</span>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/fabriziodemaria/compass-site/releases" target="_blank" rel="noopener">
+        Release notes
+      </a>
+    </div>
+    <p class="footer-disclaimer">Not affiliated with, endorsed by, or sponsored by Cursor (Anysphere) or GitHub. Cursor and GitHub are trademarks of their respective owners.</p>
   </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      window.addEventListener('scroll', function () {
+        nav.classList.toggle('scrolled', window.scrollY > 8);
+      }, { passive: true });
+
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || els.length === 0) {
+        els.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
 
 </body>
 </html>
